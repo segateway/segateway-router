@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "segway-connect-system-destination-otlp"
+name = "segway-connect-system-router"
 version = "0.1.0"
 description = ""
 authors = ["Ryan Faircloth <ryan@dss-i.com>"]
