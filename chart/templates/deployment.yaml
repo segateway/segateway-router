@@ -41,7 +41,7 @@ spec:
           - name: SEGWAY_CONFIG_PATH
             value: /app/config/
           - name: SEGWAY_OTLP_EWMM
-            value: {{ .Values.secret.data.instanceName | default .Release.Name | quote }}
+            value: ls-cloud-segateway-destination-logscale
           ports:
             - name: otlp-http
               containerPort: {{ .Values.service.port }}
