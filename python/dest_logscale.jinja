@@ -1,0 +1,49 @@
+#
+{%- for filter in config["filters"] %}
+filter {{ filter.name }}{
+    {{ filter.condition }}
+};
+{% endfor %}
+#
+destination d_otlp{
+    otlp(
+        url('{{ url }}')
+        token('{{ token }}')
+    );
+};
+#
+{%- for logPath in config["logPaths"] %}
+#
+log {{ logPath.name }}{
+    {%- if logPath["filters"] %}
+    filter {
+        {{ ' or '.join(logPath["filters"]) }};
+    };
+    {%- endif %}
+
+    rewrite {
+    {%- if logPath.template %}
+        set('{{ logPath.template }}', value('.otlp.template'));
+    {%- else %}
+        set('t_otlp_parsed_w_raw', value('.otlp.template'));
+    {%- endif %}
+        set("{{ logPath.repo }}", value('.otlp.hec.index'));
+    {%- if logPath.source %}
+        set("{{ logPath.source }}", value('.otlp.hec.source'));
+    {%- endif %}
+    {%- if logPath.sourcetype %}
+        set("{{ logPath.sourcetype }}", value('.otlp.hec.sourcetype'));
+    {%- endif %}
+    {%- for tag in logPath.tags %}    
+        set("{{ tag.value }}", value('.otlp.tags.{{ tag.name }}'));
+    {%- endfor %}
+    };
+
+    destination(d_syslog_ng_otlp);
+
+    {%- if logPath.flags %}
+    flags({{ ','.join(logPath.flags) }});
+    {%- endif %}
+};
+{% endfor %}
+#

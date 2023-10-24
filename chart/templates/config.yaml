@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "segway-sys-router.configmapname" . }}
+  labels:
+    {{- include "segway-sys-router.labels" . | nindent 4 }}
+  {{- with .Values.config.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  config.yaml: |
+  {{- with .Values.config.syslogng }}
+      {{- toYaml . | nindent 4 }}
+  {{- end }}
